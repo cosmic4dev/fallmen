@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "486508263600",
+    "firebase_url": "https://campingchat-8fb70.firebaseio.com",
+    "project_id": "campingchat-8fb70",
+    "storage_bucket": "campingchat-8fb70.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486508263600:android:edfc472417e8ebfc3a6375",
+        "android_client_info": {
+          "package_name": "cosmic.com.firstchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "486508263600-0ised8l49n4r1eqtamah4hg8j3gjspst.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBU6NSdxTDZWPQOS8UGIoBIYcbJvcf3SJ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "486508263600-0ised8l49n4r1eqtamah4hg8j3gjspst.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
