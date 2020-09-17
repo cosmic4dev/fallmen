@@ -1,9 +1,13 @@
 package cosmic.com.firstchat;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,19 +15,29 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.TreeMap;
 
 import cosmic.com.firstchat.Model.ChatModel;
+import cosmic.com.firstchat.Model.User;
 
 public class ChatFragment extends Fragment {
 
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm");
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -39,11 +53,12 @@ public class ChatFragment extends Fragment {
 
         private List<ChatModel>chatModels = new ArrayList<>();
         private String uid;
+        private ArrayList<String>destinationUsers=new ArrayList<>();
 
         public ChatRecyclerViewAdapter() {
             uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-            FirebaseDatabase.getInstance().getReference().child( "chatrooms" ).orderByChild( "users/"+uid ).addListenerForSingleValueEvent( new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference().child( "chatrooms" ).orderByChild( "users/"+uid ).equalTo( true ).addListenerForSingleValueEvent( new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     chatModels.clear();
@@ -68,9 +83,57 @@ public class ChatFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
+            final CustomViewHolder customViewHolder = (CustomViewHolder)holder;
+            String destinationUid=null;
 
+            //챗방에 있는 유저 체크
+            for(String user: chatModels.get( position ).users.keySet()){
+                if(!user.equals( uid )){
+                    destinationUid=user;
+                    destinationUsers.add( destinationUid );
+                }
+            }
+            FirebaseDatabase.getInstance().getReference().child( "users" ).child( destinationUid ).addValueEventListener( new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    Glide.with( customViewHolder.imageView.getContext() )
+                            .load( user.profileImageUrl )
+                            .apply( new RequestOptions() ).circleCrop()
+                            .into( customViewHolder.imageView );
+                    customViewHolder.tv_title.setText(user.userName );
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            } );
+
+            //내림차순해서 마지막 메시지 키값을 가져옴..
+            Map<String, ChatModel.Comment>commentMap = new TreeMap<>( Collections.reverseOrder());
+            commentMap.putAll( chatModels.get( position ).comments );
+            String lastMessageKey = (String) commentMap.keySet().toArray( )[0];
+            customViewHolder.tv_last_message.setText(chatModels.get( position ).comments.get( lastMessageKey ).message);
+
+            customViewHolder.imageView.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(),MessageActivity.class);
+                    intent.putExtra( "destinaionUid",destinationUsers.get( position ) );
+                    ActivityOptions activityOptions=ActivityOptions.makeCustomAnimation( v.getContext(),R.anim.fromright,R.anim.toleft );
+                    startActivity( intent,activityOptions.toBundle() );
+                }
+            } );
+            //TimeStamp
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+            long unixTime = (long) chatModels.get(position).comments.get(lastMessageKey).timestamp;
+            Date date = new Date(unixTime);
+            customViewHolder.tv_timestamp.setText(simpleDateFormat.format(date));
         }
+
 
         @Override
         public int getItemCount() {
@@ -78,8 +141,19 @@ public class ChatFragment extends Fragment {
         }
 
         private class CustomViewHolder extends RecyclerView.ViewHolder {
+            public ImageView imageView;
+            public TextView tv_title;
+            public TextView tv_last_message;
+            public TextView tv_timestamp;
+
             public CustomViewHolder(View view) {
                 super(view);
+
+                imageView=view.findViewById( R.id.chatitem_iv );
+                tv_title=view.findViewById( R.id.chatitem_tv_title );
+                tv_last_message=view.findViewById( R.id.chatitem_tv_lastMessage );
+                tv_timestamp=view.findViewById( R.id.chatItem_tv_timestamp );
+
             }
         }
     }

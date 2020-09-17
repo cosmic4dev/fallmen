@@ -1,5 +1,6 @@
 package cosmic.com.firstchat;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -93,10 +94,9 @@ public class PeopleFragment extends Fragment {
                     Intent intent = new Intent(v.getContext(),MessageActivity.class);
                     intent.putExtra( "destinationUid",users.get( position ).uid );
                     Log.d("TAG","ddid: "+users.get( position ).uid);
-//                    ActivityOptions activityOptions= null;
-//                    activityOptions.makeCustomAnimation( v.getContext(),R.anim.fromright,R.anim.toleft );
-//                    startActivity( intent, activityOptions.toBundle());
-                    startActivity( intent );
+                    ActivityOptions activityOptions=ActivityOptions.makeCustomAnimation( v.getContext(),R.anim.fromright,R.anim.toleft );
+                    startActivity( intent, activityOptions.toBundle());
+//                    startActivity( intent );
                 }
             } );
         }
