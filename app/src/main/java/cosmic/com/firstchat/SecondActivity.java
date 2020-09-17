@@ -1,8 +1,13 @@
 package cosmic.com.firstchat;
 
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class SecondActivity extends AppCompatActivity {
 
@@ -11,6 +16,26 @@ public class SecondActivity extends AppCompatActivity {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_second );
 
+        getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN ,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        BottomNavigationView bottomNavigationView = findViewById( R.id.bottomnavview );
         getSupportFragmentManager().beginTransaction().replace( R.id.frame,new PeopleFragment() ).commit();
+
+        bottomNavigationView.setOnNavigationItemSelectedListener( new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.action_people:
+                        getSupportFragmentManager().beginTransaction().replace( R.id.frame,new PeopleFragment() ).commit();
+                        return true;
+                    case R.id.action_chat:
+                        getSupportFragmentManager().beginTransaction().replace( R.id.frame,new ChatFragment() ).commit();
+                        return true;
+//                    case R.id.action_account:
+//                        getSupportFragmentManager().beginTransaction().replace( R.id.frame,new () ).commit();
+//                        return true;
+                }
+                return false;
+            }
+        } );
     }
 }

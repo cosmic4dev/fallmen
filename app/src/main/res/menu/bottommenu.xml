@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/people"
+        android:id="@+id/action_people"
         android:icon="@drawable/baseline_accessibility_black_18dp"
         android:title="People"/>
 
     <item
-        android:id="@+id/chat"
+        android:id="@+id/action_chat"
         android:icon="@drawable/baseline_chat_black_18dp"
         android:title="Chat"/>
 
     <item
-        android:id="@+id/account"
+        android:id="@+id/action_account"
         android:icon="@drawable/baseline_account_circle_black_18dp"
         android:title="Account"/>
 </menu>

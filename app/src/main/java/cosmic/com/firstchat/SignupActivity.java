@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import cosmic.com.firstchat.Model.User;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -33,7 +37,6 @@ public class SignupActivity extends AppCompatActivity {
     private Uri imageUri;
     public static final int PICK_FROM_ALBUM=10;
     private StorageReference mStorageRef;
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
@@ -76,36 +79,43 @@ public class SignupActivity extends AppCompatActivity {
                         .createUserWithEmailAndPassword( email.getText().toString(),password.getText().toString() )
                         .addOnCompleteListener( SignupActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-//                                if (task.isSuccessful()) {
-//                                    Toast.makeText( getApplicationContext(), "성공", Toast.LENGTH_SHORT ).show();
-
-
+                            public void onComplete(@NonNull final Task<AuthResult> task) {
+//
                                     final String uid= task.getResult().getUser().getUid();
-                                    FirebaseStorage.getInstance().getReference().child( "userImages" ).child( uid ).putFile(imageUri ).addOnCompleteListener( new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                            @SuppressWarnings( "VisibleForTests" )
-                                            String imageUrl = task.getResult().getTask().toString();
-
-                                            User user=new User();
-                                            user.userName=name.getText().toString();
-                                            user.profileImageUrl=imageUrl;
-
-                                            FirebaseDatabase.getInstance().getReference().child( "users" ).child(uid).setValue( user );
-                                        }
-                                    } );
 
 
+                                    FirebaseStorage.getInstance().getReference()
+                                            .child( "userImages" ).child( uid ).putFile(imageUri )
+                                          .addOnSuccessListener( new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                              @Override
+                                              public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                                    SignupActivity.this.finish();
+                                                  //사용법이 바뀜 그리고 업로드 경로와 다운로드 경로는 다르다.
+                                                  //The getDownloadUrl method has now been depreciated in the new firebase update. Instead use the following method.
+
+                                                  FirebaseStorage.getInstance().getReference().child( "userImages" ).child( uid )
+                                                          .getDownloadUrl().addOnSuccessListener( new OnSuccessListener<Uri>() {
+                                                      @Override
+                                                      public void onSuccess(Uri uri) {
+                                                          String imageUrl = uri.toString();
+                                                          Log.d( "TAG","이미지 Url: "+ imageUrl );
+//
+                                                          User user=new User();
+                                                          user.userName=name.getText().toString();
+                                                          user.profileImageUrl=imageUrl;
+                                                          user.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                                          FirebaseDatabase.getInstance().getReference().child( "users" ).child(uid).setValue( user );
+                                                          SignupActivity.this.finish();
+
+                                                      }
+                                                  } );
 
 
-//                                }else{
-//                                    Log.w("TAG", "signInWithEmail:failure", task.getException());
-//                                    Toast.makeText(getApplicationContext(), "Authentication failed.",
-//                                            Toast.LENGTH_SHORT).show();
-//                                }
+                                              }
+                                          } );
+
+
                             }
                         } );
 
