@@ -84,25 +84,25 @@ public class ChatFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-            final CustomViewHolder customViewHolder = (CustomViewHolder)holder;
-            String destinationUid=null;
+            final CustomViewHolder customViewHolder = (CustomViewHolder) holder;
+            String destinationUid = null;
 
             //챗방에 있는 유저 체크
-            for(String user: chatModels.get( position ).users.keySet()){
-                if(!user.equals( uid )){
-                    destinationUid=user;
+            for (String user : chatModels.get( position ).users.keySet()) {
+                if (!user.equals( uid )) {
+                    destinationUid = user;
                     destinationUsers.add( destinationUid );
                 }
             }
             FirebaseDatabase.getInstance().getReference().child( "users" ).child( destinationUid ).addValueEventListener( new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    User user = dataSnapshot.getValue(User.class);
+                    User user = dataSnapshot.getValue( User.class );
                     Glide.with( customViewHolder.imageView.getContext() )
                             .load( user.profileImageUrl )
                             .apply( new RequestOptions() ).circleCrop()
                             .into( customViewHolder.imageView );
-                    customViewHolder.tv_title.setText(user.userName );
+                    customViewHolder.tv_title.setText( user.userName );
 
                 }
 
@@ -113,27 +113,37 @@ public class ChatFragment extends Fragment {
             } );
 
             //내림차순해서 마지막 메시지 키값을 가져옴..
-            Map<String, ChatModel.Comment>commentMap = new TreeMap<>( Collections.reverseOrder());
+            Map<String, ChatModel.Comment> commentMap = new TreeMap<>( Collections.reverseOrder() );
             commentMap.putAll( chatModels.get( position ).comments );
-            String lastMessageKey = (String) commentMap.keySet().toArray( )[0];
-            customViewHolder.tv_last_message.setText(chatModels.get( position ).comments.get( lastMessageKey ).message);
 
-            customViewHolder.imageView.setOnClickListener( new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(),MessageActivity.class);
-                    intent.putExtra( "destinaionUid",destinationUsers.get( position ) );
-                    ActivityOptions activityOptions=ActivityOptions.makeCustomAnimation( v.getContext(),R.anim.fromright,R.anim.toleft );
-                    startActivity( intent,activityOptions.toBundle() );
-                }
-            } );
-            //TimeStamp
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
-            long unixTime = (long) chatModels.get(position).comments.get(lastMessageKey).timestamp;
-            Date date = new Date(unixTime);
-            customViewHolder.tv_timestamp.setText(simpleDateFormat.format(date));
+            if (commentMap.keySet().toArray().length > 0) {
+                String lastMessageKey = (String) commentMap.keySet().toArray()[0];
+                customViewHolder.tv_last_message.setText( chatModels.get( position ).comments.get( lastMessageKey ).message );
+
+                customViewHolder.imageView.setOnClickListener( new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Intent intent = null;
+                        if(chatModels.get(position).users.size()>2){
+                            intent = new Intent(v.getContext(),GroupMessageActivity.class);
+                        }else{
+                            intent = new Intent( v.getContext(), MessageActivity.class );
+                            intent.putExtra( "destinaionUid", destinationUsers.get( position ) );
+                        }
+                        ActivityOptions activityOptions = ActivityOptions.makeCustomAnimation( v.getContext(), R.anim.fromright, R.anim.toleft );
+                        startActivity( intent, activityOptions.toBundle() );
+                    }
+                } );
+                //TimeStamp
+                simpleDateFormat.setTimeZone( TimeZone.getTimeZone( "Asia/Seoul" ) );
+                long unixTime = (long) chatModels.get( position ).comments.get( lastMessageKey ).timestamp;
+                Date date = new Date( unixTime );
+                customViewHolder.tv_timestamp.setText( simpleDateFormat.format( date ) );
+            }
+
+
         }
-
 
         @Override
         public int getItemCount() {

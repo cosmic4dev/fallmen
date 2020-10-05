@@ -1,16 +1,20 @@
 package cosmic.com.firstchat;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +40,9 @@ public class SecondActivity extends AppCompatActivity {
                     case R.id.action_chat:
                         getSupportFragmentManager().beginTransaction().replace( R.id.frame,new ChatFragment() ).commit();
                         return true;
-//                    case R.id.action_account:
-//                        getSupportFragmentManager().beginTransaction().replace( R.id.frame,new () ).commit();
-//                        return true;
+                    case R.id.action_account:
+                        getSupportFragmentManager().beginTransaction().replace( R.id.frame,new AccountFragment() ).commit();
+                        return true;
                 }
                 return false;
             }
@@ -48,13 +52,34 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     void passPushTokenToServer(){
-        String uid= FirebaseAuth.getInstance().getCurrentUser().getUid();
-//        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener( new OnCompleteListener<Instand>() )
-        String token = FirebaseInstanceId.getInstance().getToken(  );
-        Map<String,Object>map = new HashMap<>();
-        map.put("pushToken",token);
 
-        FirebaseDatabase.getInstance().getReference().child( "users" ).child( uid ).updateChildren( map );
+
+//        String token = FirebaseInstanceId.getInstance().getToken(  );   //deprecated
+
+
+        //so new it is.
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("TAG", "getInstanceId failed", task.getException());
+                            return;
+                        }
+                        String uid= FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        Map<String,Object> map = new HashMap<>();
+                        map.put("pushToken",token);
+
+                        FirebaseDatabase.getInstance().getReference().child("users").child(uid).updateChildren(map);
+
+                        Log.d("TAG","토큰푸쉬: " +token);
+                    }
+                });
+
+
+
 
     }
 }

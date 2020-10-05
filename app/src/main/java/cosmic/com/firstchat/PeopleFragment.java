@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,6 +39,15 @@ public class PeopleFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView)view.findViewById( R.id.recyclerview );
         recyclerView.setLayoutManager( new LinearLayoutManager( inflater.getContext() ) );
         recyclerView.setAdapter(new PeopleAdapter() );
+
+        FloatingActionButton floatingActionButton  = view.findViewById( R.id.peoplefragment_floatingButton );
+        floatingActionButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(),SelectFriendActivity.class);
+                startActivity( intent );
+            }
+        } );
         return view;
     }
 
@@ -82,7 +92,7 @@ public class PeopleFragment extends Fragment {
 
 
         @Override
-        public void onBindViewHolder(@NonNull CostumViewHolder holder, final int position) {
+        public void onBindViewHolder(@NonNull final CostumViewHolder holder, final int position) {
             Glide.with( holder.imageView.getContext()).load( users.get(position).profileImageUrl )
                     .apply( new RequestOptions().circleCrop() ).into( (ImageView) holder.imageView );
 
@@ -97,6 +107,10 @@ public class PeopleFragment extends Fragment {
                     ActivityOptions activityOptions=ActivityOptions.makeCustomAnimation( v.getContext(),R.anim.fromright,R.anim.toleft );
                     startActivity( intent, activityOptions.toBundle());
 //                    startActivity( intent );
+
+                    if(users.get( position ).comment!=null) {
+                        holder.textView_comment.setText( users.get( position ).comment );
+                    }
                 }
             } );
         }
@@ -113,11 +127,13 @@ public class PeopleFragment extends Fragment {
 
             public ImageView imageView;
             public TextView textView;
+            public TextView textView_comment;
 
             public CostumViewHolder(@NonNull View itemView) {
                 super( itemView );
-                imageView= itemView.findViewById( R.id.image_friend );
+                imageView= itemView.findViewById( R.id.frienditem_imageview );
                 textView=itemView.findViewById( R.id.friend_textview );
+                textView_comment = itemView.findViewById( R.id.frienditem_textview_comment );
             }
         }
     }
