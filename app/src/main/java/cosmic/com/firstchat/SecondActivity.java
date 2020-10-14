@@ -52,10 +52,20 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     void passPushTokenToServer(){
+//reset test1
+<<<<<<< HEAD
+        //reset test2
+//reset test3
+        //revert test
+=======
+
+        //reset test2
+//reset test3
+        //revert test
 
 
+>>>>>>> firstman
 //        String token = FirebaseInstanceId.getInstance().getToken(  );   //deprecated
-
 
         //so new it is.
         FirebaseInstanceId.getInstance().getInstanceId()
