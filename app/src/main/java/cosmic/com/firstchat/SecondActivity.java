@@ -57,6 +57,9 @@ public class SecondActivity extends AppCompatActivity {
 //        String token = FirebaseInstanceId.getInstance().getToken(  );   //deprecated
 
 //test
+        //test1
+        //test2
+        //1
         //so new it is.
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
