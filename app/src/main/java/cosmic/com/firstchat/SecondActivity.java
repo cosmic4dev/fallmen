@@ -52,38 +52,10 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     void passPushTokenToServer(){
-//reset test1
-<<<<<<< HEAD
-        //reset test2
-//reset test3
-        //revert test
-=======
 
-        //reset test2
-//reset test3
-        //revert test
-
-
-<<<<<<< HEAD
->>>>>>> firstman
 //        String token = FirebaseInstanceId.getInstance().getToken(  );   //deprecated
 
-=======
-//test
-<<<<<<< HEAD
-=======
-        //test1
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        //test2
->>>>>>> secondman
-=======
-        //test2
-        //1
->>>>>>> b6fe5e4fcb5663ded2646d8fa0f22a977a4511be
->>>>>>> firstman
->>>>>>> b20fb836e5beff37f90aa797a08dc10b04906b1f
+
         //so new it is.
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
