@@ -59,9 +59,14 @@ public class SecondActivity extends AppCompatActivity {
 //test
         //test1
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         //test2
 >>>>>>> secondman
+=======
+        //test2
+        //1
+>>>>>>> b6fe5e4fcb5663ded2646d8fa0f22a977a4511be
         //so new it is.
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
